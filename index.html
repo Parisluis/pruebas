@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualización 3D con AR</title>
+    <title>AR con Navegación de Obstáculos</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
         body { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         .controls {
-            position: absolute;
-            top: 10px;
+            position: fixed;
+            top: 5px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             gap: 10px;
-            z-index: 1000;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px;
+            border-radius: 10px;
         }
         #ar-button, .animation-button { 
             background: white; 
@@ -32,9 +35,9 @@
 <body>
     <div class="controls">
         <button id="ar-button" slot="ar-button">🔍 Ver en AR</button>
-        <button class="animation-button" onclick="changeAnimation('animacion1')">Animación 1</button>
-        <button class="animation-button" onclick="changeAnimation('animacion2')">Animación 2</button>
-        <button class="animation-button" onclick="changeAnimation('animacion3')">Animación 3</button>
+        <button class="animation-button" onclick="changeAnimation('walk')">Caminar</button>
+        <button class="animation-button" onclick="changeAnimation('jump')">Saltar Obstáculo</button>
+        <button class="animation-button" onclick="changeAnimation('idle')">Detener</button>
     </div>
     
     <model-viewer id="modelViewer"
@@ -45,7 +48,7 @@
                   ar 
                   ar-scale="fixed"
                   ar-modes="webxr scene-viewer quick-look"
-                  animation-name="*"
+                  animation-name="idle"
                   animation-loop
                   style="width: 100%; height: 80vh;">
     </model-viewer>
