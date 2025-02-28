@@ -7,9 +7,16 @@
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
         body { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
         #ar-button, .animation-button { 
-            position: relative; 
-            margin-top: 10px;
             background: white; 
             border: 2px solid black; 
             padding: 10px;
@@ -23,6 +30,13 @@
     </style>
 </head>
 <body>
+    <div class="controls">
+        <button id="ar-button" slot="ar-button">🔍 Ver en AR</button>
+        <button class="animation-button" onclick="changeAnimation('animacion1')">Animación 1</button>
+        <button class="animation-button" onclick="changeAnimation('animacion2')">Animación 2</button>
+        <button class="animation-button" onclick="changeAnimation('animacion3')">Animación 3</button>
+    </div>
+    
     <model-viewer id="modelViewer"
                   src="https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb"
                   alt="Modelo 3D" 
@@ -36,14 +50,6 @@
                   style="width: 100%; height: 80vh;">
     </model-viewer>
     
-    <button id="ar-button" slot="ar-button">🔍 Ver en AR</button>
-    
-    <div>
-        <button class="animation-button" onclick="changeAnimation('animacion1')">Animación 1</button>
-        <button class="animation-button" onclick="changeAnimation('animacion2')">Animación 2</button>
-        <button class="animation-button" onclick="changeAnimation('animacion3')">Animación 3</button>
-    </div>
-    
     <script>
         function changeAnimation(animationName) {
             const modelViewer = document.getElementById("modelViewer");
@@ -52,4 +58,3 @@
     </script>
 </body>
 </html>
-
