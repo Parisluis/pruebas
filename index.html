@@ -47,28 +47,26 @@
             modelViewer.activateAR();
         });
         
-        document.getElementById("modelViewer").addEventListener("ar-status", (event) => {
-            if (event.detail.status === "session-started") {
+        document.getElementById("modelViewer").addEventListener("scene-visibility", (event) => {
+            if (event.detail.visible) {
                 startMovingModel();
             }
         });
         
         function startMovingModel() {
             const modelViewer = document.getElementById("modelViewer");
-            let positionX = 0;
-            let positionZ = 0;
-            let direction = 1;
+            let isJumping = false;
             
-            function moveModel() {
-                positionZ += 0.01 * direction;
-                modelViewer.setAttribute("position", `${positionX} 0 ${positionZ}`);
-                
-                if (Math.random() < 0.01) { // Simula un obstáculo con probabilidad
-                    direction *= -1; // Cambia de dirección al detectar obstáculo
+            function toggleAnimation() {
+                if (isJumping) {
+                    modelViewer.setAttribute("animation-name", "walk");
+                } else {
+                    modelViewer.setAttribute("animation-name", "jump");
                 }
-                requestAnimationFrame(moveModel);
+                isJumping = !isJumping;
+                setTimeout(toggleAnimation, 3000); // Alternar cada 3 segundos
             }
-            moveModel();
+            toggleAnimation();
         }
     </script>
 </body>
