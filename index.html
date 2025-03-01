@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Navegación Autónoma</title>
+    
+    <!-- Librerías necesarias -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@1.0.0"></script>
+
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
@@ -33,6 +35,7 @@
             directionalLight.position.set(5, 10, 7.5);
             scene.add(ambientLight, directionalLight);
             
+            // Cargar modelo 3D
             const loader = new THREE.GLTFLoader();
             console.log("Cargando modelo 3D...");
             loader.load(
