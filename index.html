@@ -3,71 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR con Movimiento Autónomo</title>
-    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <title>AR Navegación Autónoma</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@1.0.0"></script>
     <style>
-        body { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #ar-button { 
-            position: fixed;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white; 
-            border: 2px solid black; 
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 8px;
-            display: inline-block;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-        }
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <button id="ar-button">🔍 Ver en AR</button>
-    
-    <model-viewer id="modelViewer"
-                  src="https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb"
-                  alt="Modelo 3D" 
-                  auto-rotate 
-                  camera-controls 
-                  ar 
-                  ar-scale="fixed"
-                  ar-modes="webxr scene-viewer quick-look"
-                  animation-name="walk"
-                  animation-loop
-                  style="width: 100%; height: 80vh;">
-    </model-viewer>
-    
     <script>
-        document.getElementById("ar-button").addEventListener("click", () => {
-            const modelViewer = document.getElementById("modelViewer");
-            modelViewer.activateAR();
-        });
+        let scene, camera, renderer, model, physicsWorld, body;
         
-        document.getElementById("modelViewer").addEventListener("scene-visibility", (event) => {
-            if (event.detail.visible) {
-                startMovingModel();
-            }
-        });
-        
-        function startMovingModel() {
-            const modelViewer = document.getElementById("modelViewer");
-            let isJumping = false;
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
             
-            function toggleAnimation() {
-                if (isJumping) {
-                    modelViewer.setAttribute("animation-name", "walk");
-                } else {
-                    modelViewer.setAttribute("animation-name", "jump");
-                }
-                isJumping = !isJumping;
-                setTimeout(toggleAnimation, 3000); // Alternar cada 3 segundos
-            }
-            toggleAnimation();
+            const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+            scene.add(light);
+            
+            const loader = new THREE.GLTFLoader();
+            loader.load('https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb', (gltf) => {
+                model = gltf.scene;
+                model.scale.set(1, 1, 1);
+                scene.add(model);
+                animate();
+            });
+            
+            camera.position.set(0, 1.6, 3);
+            initPhysics();
         }
+        
+        function initPhysics() {
+            physicsWorld = new CANNON.World();
+            physicsWorld.gravity.set(0, -9.8, 0);
+            
+            body = new CANNON.Body({ mass: 1, shape: new CANNON.Box(new CANNON.Vec3(0.5, 1, 0.5)) });
+            body.position.set(0, 1, 0);
+            physicsWorld.addBody(body);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            physicsWorld.step(1 / 60);
+            if (model) {
+                model.position.copy(body.position);
+                model.rotation.y += 0.01;
+            }
+            renderer.render(scene, camera);
+        }
+        
+        init();
     </script>
 </body>
 </html>
