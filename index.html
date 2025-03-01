@@ -17,6 +17,7 @@
     <script>
         let scene, camera, renderer, model, physicsWorld, body;
         let obstacles = [];
+        let mixer;
 
         function init() {
             console.log("Iniciando escena...");
@@ -42,6 +43,12 @@
                     model = gltf.scene;
                     model.scale.set(1, 1, 1);
                     scene.add(model);
+                    
+                    if (gltf.animations.length > 0) {
+                        mixer = new THREE.AnimationMixer(model);
+                        const action = mixer.clipAction(gltf.animations[0]);
+                        action.play();
+                    }
                     animate();
                 },
                 undefined,
@@ -80,7 +87,8 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            physicsWorld.step(1 / 60);
+            if (physicsWorld) physicsWorld.step(1 / 60);
+            if (mixer) mixer.update(1 / 60);
             moveModel();
             if (model) {
                 model.position.copy(body.position);
