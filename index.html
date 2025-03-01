@@ -18,7 +18,10 @@
         let scene, camera, renderer, model, physicsWorld, body;
         
         function init() {
+            console.log("Iniciando escena...");
             scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xaaaaaa); // Fondo gris temporal para debug
+            
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -28,18 +31,28 @@
             scene.add(light);
             
             const loader = new THREE.GLTFLoader();
-            loader.load('https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb', (gltf) => {
-                model = gltf.scene;
-                model.scale.set(1, 1, 1);
-                scene.add(model);
-                animate();
-            });
+            console.log("Cargando modelo 3D...");
+            loader.load(
+                'https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb',
+                (gltf) => {
+                    console.log("Modelo cargado correctamente");
+                    model = gltf.scene;
+                    model.scale.set(1, 1, 1);
+                    scene.add(model);
+                    animate();
+                },
+                undefined,
+                (error) => {
+                    console.error("Error al cargar el modelo: ", error);
+                }
+            );
             
             camera.position.set(0, 1.6, 3);
             initPhysics();
         }
         
         function initPhysics() {
+            console.log("Iniciando física...");
             physicsWorld = new CANNON.World();
             physicsWorld.gravity.set(0, -9.8, 0);
             
