@@ -4,24 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AR Navegación Autónoma</title>
+    
+    <!-- Carga correcta de Three.js y GLTFLoader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-    </style>
-</head>
-<body>
     <script type="module">
         import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/loaders/GLTFLoader.js';
-        import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
-        import * as MotionControllers from 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@1.0.0';
 
-        let scene, camera, renderer, model, physicsWorld, body;
-
+        let scene, camera, renderer, model;
+        
         function init() {
             console.log("Iniciando escena...");
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xaaaaaa); // Fondo gris temporal para debug
+            scene.background = new THREE.Color(0xaaaaaa);
             
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -33,12 +27,13 @@
             directionalLight.position.set(5, 10, 7.5);
             scene.add(ambientLight, directionalLight);
             
+            // Cargar modelo GLTF
             const loader = new GLTFLoader();
             console.log("Cargando modelo 3D...");
             loader.load(
                 'https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb',
                 (gltf) => {
-                    console.log("✅ Modelo cargado correctamente");
+                    console.log("Modelo cargado correctamente");
                     model = gltf.scene;
                     model.scale.set(1, 1, 1);
                     scene.add(model);
@@ -46,48 +41,30 @@
                 },
                 undefined,
                 (error) => {
-                    console.error("❌ Error al cargar el modelo:", error);
-                    addFallbackCube();
+                    console.error("Error al cargar el modelo: ", error);
                 }
             );
-            
+
             camera.position.set(0, 1.6, 3);
             console.log("Posición inicial de la cámara:", camera.position);
-            initPhysics();
-        }
-
-        function initPhysics() {
-            console.log("Iniciando física...");
-            physicsWorld = new CANNON.World();
-            physicsWorld.gravity.set(0, -9.8, 0);
-            
-            body = new CANNON.Body({ mass: 1, shape: new CANNON.Box(new CANNON.Vec3(0.5, 1, 0.5)) });
-            body.position.set(0, 1, 0);
-            physicsWorld.addBody(body);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            physicsWorld.step(1 / 60);
             if (model) {
-                model.position.copy(body.position);
                 model.rotation.y += 0.01;
-                console.log("Posición del modelo:", model.position);
             }
             renderer.render(scene, camera);
         }
 
-        function addFallbackCube() {
-            console.log("Agregando cubo de prueba");
-            const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-            const cube = new THREE.Mesh(geometry, material);
-            cube.position.set(0, 1, 0);
-            scene.add(cube);
-            animate();
-        }
-
         init();
     </script>
+
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
 </body>
 </html>
