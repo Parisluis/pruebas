@@ -10,51 +10,59 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/GLTFLoader.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
     </style>
 </head>
-<body>
+<body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs>
-        <a-marker type="pattern" url="marker.patt">
-            <a-entity id="model" position="0 0 0" scale="0.5 0.5 0.5"></a-entity>
+        <a-marker preset="hiro">
+            <a-entity id="model" position="0 0 0" scale="1 1 1"></a-entity>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
         let modelEntity = document.getElementById("model");
-        let mixer;
+        let loader = new THREE.GLTFLoader();
 
-        function loadModel() {
-            const loader = new THREE.GLTFLoader();
-            loader.load(
-                'https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb',
-                function (gltf) {
-                    let model = gltf.scene;
-                    modelEntity.object3D.add(model);
-
-                    if (gltf.animations.length > 0) {
-                        mixer = new THREE.AnimationMixer(model);
-                        gltf.animations.forEach((clip) => {
-                            const action = mixer.clipAction(clip);
-                            action.play();
-                        });
-                    }
-                },
-                undefined,
-                function (error) {
-                    console.error("Error al cargar el modelo:", error);
+        loader.load(
+            'https://raw.githubusercontent.com/Parisluis/pruebas/main/mi-modelo.glb',
+            (gltf) => {
+                console.log("Modelo cargado correctamente", gltf);
+                let model = gltf.scene;
+                model.scale.set(0.5, 0.5, 0.5);
+                modelEntity.setObject3D('mesh', model);
+                
+                if (gltf.animations.length > 0) {
+                    let mixer = new THREE.AnimationMixer(model);
+                    let action = mixer.clipAction(gltf.animations[0]);
+                    action.play();
+                    animate(mixer);
+                } else {
+                    animateManual(model);
                 }
-            );
+            },
+            undefined,
+            (error) => {
+                console.error("Error al cargar el modelo: ", error);
+            }
+        );
+
+        function animate(mixer) {
+            function update() {
+                requestAnimationFrame(update);
+                mixer.update(0.01);
+            }
+            update();
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (mixer) mixer.update(0.02);
-            modelEntity.object3D.position.y = Math.sin(Date.now() * 0.002) * 0.2;
+        function animateManual(model) {
+            function update() {
+                requestAnimationFrame(update);
+                model.rotation.y += 0.01;
+            }
+            update();
         }
-
-        loadModel();
-        animate();
     </script>
 </body>
 </html>
